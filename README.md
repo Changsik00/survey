@@ -5,6 +5,8 @@
 - 빌드 도구: Vite
 - 패키지 관리자: pnpm
 - 스타일 가이드: ESLint, Prettier
+- 스타일링: Tailwind CSS
+- 유틸리티: cn (clsx + tailwind-merge 조합으로 구현)
 - 컨테이너화: Docker, Docker Compose
 
 ## 🌻 설치 및 실행 방법
