@@ -7,3 +7,10 @@
   --breakpoint-desktop: 80rem;
 }
 
+@layer base {
+  input, 
+  textarea, 
+  select {
+    @apply text-gray-900 bg-white;
+  }
+}
