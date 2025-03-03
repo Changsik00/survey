@@ -3,6 +3,11 @@ import { useFieldArray, useFormContext } from 'react-hook-form';
 import { FieldTypeValue, FieldTypeEnum } from '@/types/field';
 import { TemplateFormValues } from '@/types/schema';
 
+interface FieldError {
+  message?: string;
+  type?: string;
+}
+
 const FieldsManager = () => {
   const {
     control,
@@ -25,13 +30,21 @@ const FieldsManager = () => {
     });
   };
 
+  // 타입 가드: FieldError인지 확인
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const isFieldError = (error: any): error is FieldError => {
+    return error && typeof error.message === 'string';
+  };
+
   return (
     <div className="mb-6">
       <h3 className="text-lg font-semibold mb-4 text-gray-800">필드</h3>
       {fields.map((field, index) => (
         <div key={field.id} className="mb-4 p-4 border border-gray-200 rounded-md bg-gray-50">
           <div className="mb-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">라벨</label>
+            <label htmlFor={`fields.${index}.label`} className="block text-sm font-medium text-gray-700 mb-1">
+              라벨
+            </label>
             <input
               {...register(`fields.${index}.label`)}
               className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -42,7 +55,9 @@ const FieldsManager = () => {
           </div>
 
           <div className="mb-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">타입</label>
+            <label htmlFor={`fields.${index}.label`} className="block text-sm font-medium text-gray-700 mb-1">
+              타입
+            </label>
             <select
               {...register(`fields.${index}.type`)}
               className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -53,7 +68,7 @@ const FieldsManager = () => {
               <option value={FieldTypeEnum.RADIO}>라디오</option>
               <option value={FieldTypeEnum.DROPDOWN}>드롭다운</option>
             </select>
-            {errors.fields?.[index]?.type && (
+            {errors.fields?.[index]?.type && isFieldError(errors.fields[index].type) && (
               <p className="mt-1 text-sm text-red-500">{errors.fields[index].type.message}</p>
             )}
           </div>
