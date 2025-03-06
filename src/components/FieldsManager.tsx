@@ -1,87 +1,63 @@
+// src/components/FieldsManager.tsx
 import { useFieldArray, useFormContext } from 'react-hook-form';
+import { v4 as uuidv4 } from 'uuid';
 
-import { FieldTypeValue, FieldTypeEnum } from '@/types/field';
+import RadioFieldEditor from '@/components/template//RadioFieldEditor';
+import TextFieldEditor from '@/components/template//TextFieldEditor';
+import CheckboxFieldEditor from '@/components/template/CheckboxFieldEditor';
+import { FieldTypeEnum } from '@/types/field';
 import { TemplateFormValues } from '@/types/schema';
 
-interface FieldError {
-  message?: string;
-  type?: string;
-}
-
 const FieldsManager = () => {
-  const {
-    control,
-    register,
-    formState: { errors },
-  } = useFormContext<TemplateFormValues>();
-
+  const { control } = useFormContext<TemplateFormValues>();
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'fields',
   });
 
-  const addField = (type: FieldTypeValue) => {
-    append({
-      id: crypto.randomUUID(),
+  const addField = (type: FieldTypeEnum) => {
+    const baseField = {
+      id: uuidv4(),
       type,
       label: `New ${type} field`,
       required: false,
       order: fields.length,
-    });
+    };
+
+    if (type === FieldTypeEnum.CHECKBOX || type === FieldTypeEnum.RADIO) {
+      append({
+        ...baseField,
+        options: [{ id: uuidv4(), label: '옵션 1', checked: false }],
+      });
+    } else {
+      append(baseField);
+    }
   };
 
-  // 타입 가드: FieldError인지 확인
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const isFieldError = (error: any): error is FieldError => {
-    return error && typeof error.message === 'string';
+  const renderFieldEditor = (field: unknown, index: number) => {
+    if (isCheckboxField(field)) {
+      return <CheckboxFieldEditor index={index} />;
+    } else if (isRadioField(field)) {
+      return <RadioFieldEditor index={index} />;
+    } else {
+      return <TextFieldEditor index={index} />;
+    }
   };
+
+  // 타입 가드: 필드가 CheckboxField인지 확인
+  const isCheckboxField = (field: unknown): field is { type: FieldTypeEnum.CHECKBOX } =>
+    typeof field === 'object' && field !== null && 'type' in field && field.type === FieldTypeEnum.CHECKBOX;
+
+  // 타입 가드: 필드가 RadioField인지 확인
+  const isRadioField = (field: unknown): field is { type: FieldTypeEnum.RADIO } =>
+    typeof field === 'object' && field !== null && 'type' in field && field.type === FieldTypeEnum.RADIO;
 
   return (
     <div className="mb-6">
       <h3 className="text-lg font-semibold mb-4 text-gray-800">필드</h3>
       {fields.map((field, index) => (
         <div key={field.id} className="mb-4 p-4 border border-gray-200 rounded-md bg-gray-50">
-          <div className="mb-2">
-            <label htmlFor={`fields.${index}.label`} className="block text-sm font-medium text-gray-700 mb-1">
-              라벨
-            </label>
-            <input
-              {...register(`fields.${index}.label`)}
-              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            {errors.fields?.[index]?.label && (
-              <p className="mt-1 text-sm text-red-500">{errors.fields[index].label.message}</p>
-            )}
-          </div>
-
-          <div className="mb-2">
-            <label htmlFor={`fields.${index}.label`} className="block text-sm font-medium text-gray-700 mb-1">
-              타입
-            </label>
-            <select
-              {...register(`fields.${index}.type`)}
-              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value={FieldTypeEnum.TEXT}>텍스트</option>
-              <option value={FieldTypeEnum.TEXTAREA}>텍스트 영역</option>
-              <option value={FieldTypeEnum.CHECKBOX}>체크박스</option>
-              <option value={FieldTypeEnum.RADIO}>라디오</option>
-              <option value={FieldTypeEnum.DROPDOWN}>드롭다운</option>
-            </select>
-            {errors.fields?.[index]?.type && isFieldError(errors.fields[index].type) && (
-              <p className="mt-1 text-sm text-red-500">{errors.fields[index].type.message}</p>
-            )}
-          </div>
-
-          <label className="flex items-center gap-2 mb-2">
-            <input
-              type="checkbox"
-              {...register(`fields.${index}.required`)}
-              className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-            />
-            <span className="text-sm text-gray-700">필수</span>
-          </label>
-
+          {renderFieldEditor(field, index)}
           <button
             type="button"
             onClick={() => remove(index)}
@@ -91,21 +67,27 @@ const FieldsManager = () => {
           </button>
         </div>
       ))}
-
       <div className="flex gap-2">
         <button
           type="button"
           onClick={() => addField(FieldTypeEnum.TEXT)}
-          className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 transition-colors"
+          className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600"
         >
           텍스트 추가
         </button>
         <button
           type="button"
           onClick={() => addField(FieldTypeEnum.CHECKBOX)}
-          className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 transition-colors"
+          className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600"
         >
           체크박스 추가
+        </button>
+        <button
+          type="button"
+          onClick={() => addField(FieldTypeEnum.RADIO)}
+          className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600"
+        >
+          라디오 추가
         </button>
       </div>
     </div>
