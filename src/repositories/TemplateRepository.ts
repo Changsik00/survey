@@ -6,3 +6,7 @@ export interface TemplateRepository {
   findAll(): TemplateFormValues[];
   delete(id: string): void;
 }
+
+export interface TemplateWithId extends TemplateFormValues {
+  id: string;
+}

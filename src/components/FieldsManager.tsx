@@ -1,4 +1,3 @@
-// src/components/FieldsManager.tsx
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { v4 as uuidv4 } from 'uuid';
 
