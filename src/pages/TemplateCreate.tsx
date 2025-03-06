@@ -1,11 +1,21 @@
+import { useNavigate } from 'react-router-dom';
+import { v4 as uuidv4 } from 'uuid';
+
 import TemplateForm from '@/components/TemplateForm';
+import { LocalStorageTemplateRepository } from '@/repositories/LocalStorageTemplateRepository';
 import { TemplateFormValues } from '@/types/schema';
 
 const TemplateCreate = () => {
+  const navigate = useNavigate();
+  const repository = new LocalStorageTemplateRepository();
+
   const handleSubmit = (data: TemplateFormValues) => {
-    // 유효한 데이터만 여기로 전달됨
-    console.warn('Validated data received:', data);
-    // 비즈니스 로직: localStorage 저장, API 호출 등
+    if (!data.id) {
+      data.id = uuidv4(); // ID가 없으면 생성
+    }
+    repository.save(data);
+    // TODO: 템플릿 id로 url 만들고 복사하기 모달 띄우기
+    navigate('/');
   };
 
   return (

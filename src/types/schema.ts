@@ -23,7 +23,7 @@ export const TemplateSchema = z.object({
   id: z.string(),
   name: z.string().min(1, '템플릿 이름을 입력해주세요'),
   description: z.string().optional(),
-  fields: z.array(FieldSchema),
+  fields: z.array(FieldSchema).min(1, '최소 하나의 필드가 필요합니다'),
 });
 
 export type TemplateFormValues = z.infer<typeof TemplateSchema>;

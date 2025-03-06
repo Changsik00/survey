@@ -1,9 +1,10 @@
+// src/components/TemplateForm.tsx
 import { zodResolver } from '@hookform/resolvers/zod';
 import { FormProvider, useForm } from 'react-hook-form';
+import { v4 as uuidv4 } from 'uuid';
 
 import FieldsManager from '@/components/FieldsManager';
 import { TemplateSchema, TemplateFormValues } from '@/types/schema';
-
 interface TemplateFormProps {
   onSubmit: (data: TemplateFormValues) => void;
   defaultValues?: Partial<TemplateFormValues>;
@@ -13,6 +14,7 @@ const TemplateForm = ({ onSubmit, defaultValues }: TemplateFormProps) => {
   const methods = useForm<TemplateFormValues>({
     resolver: zodResolver(TemplateSchema),
     defaultValues: defaultValues || {
+      id: uuidv4(),
       name: '',
       description: '',
       fields: [],
@@ -32,7 +34,6 @@ const TemplateForm = ({ onSubmit, defaultValues }: TemplateFormProps) => {
   return (
     <FormProvider {...methods}>
       <form onSubmit={handleSubmit(handleFormSubmit)} className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md">
-        {/* 템플릿 이름 입력 */}
         <div className="mb-6">
           <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
             템플릿 이름
@@ -45,7 +46,6 @@ const TemplateForm = ({ onSubmit, defaultValues }: TemplateFormProps) => {
           {errors.name && <p className="mt-1 text-sm text-red-500">{errors.name.message}</p>}
         </div>
 
-        {/* 설명 입력 */}
         <div className="mb-6">
           <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
             설명
@@ -58,17 +58,14 @@ const TemplateForm = ({ onSubmit, defaultValues }: TemplateFormProps) => {
           {errors.description && <p className="mt-1 text-sm text-red-500">{errors.description.message}</p>}
         </div>
 
-        {/* 필드 관리 섹션 */}
         <div className="mb-6">
           <FieldsManager />
         </div>
 
-        {/* fields 배열 에러 */}
         {errors.fields && !Array.isArray(errors.fields) && errors.fields.message && (
           <p className="mb-4 text-sm text-red-500">{errors.fields.message}</p>
         )}
 
-        {/* 버튼 섹션 */}
         <div className="flex gap-4">
           <button
             type="submit"
