@@ -48,7 +48,6 @@ const SurveyForm = ({ template, onSubmit }: SurveyFormProps) => {
   };
 
   const onFormSubmit = (data: SurveyResponse) => {
-    console.warn('Survey submitted:', data); // 디버깅 로그
     onSubmit(data);
   };
 
