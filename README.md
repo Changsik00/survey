@@ -10,6 +10,7 @@
 - 컨테이너화: Docker, Docker Compose
 - 유효성 검사 도구: react-hook-form, zod
 - 데이터 관리: Repository Pattern (`localStorage` 기반)
+- ui tool: shadcn
 
 ## 🌻 설치 및 실행 방법
 
@@ -114,3 +115,7 @@ FieldsManager: "필드 이름은 필수입니다" 같은 개별 에러 띄움.
 사용자 경험: 입력 오류 바로 알려주고, 비즈니스 로직은 조용히 처리해요.
 테스트 용이성: Repository를 Mock으로 대체해서 데이터 로직 테스트 쉬움.
 ```
+
+## 🎨 UI 컴포넌트
+
+[shadcn](https://ui.shadcn.com/docs/installation/vite)
