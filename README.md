@@ -119,3 +119,7 @@ FieldsManager: "필드 이름은 필수입니다" 같은 개별 에러 띄움.
 ## 🎨 UI 컴포넌트
 
 [shadcn](https://ui.shadcn.com/docs/installation/vite)
+
+```bash
+pnpm dlx shadcn@latest add button card dialog input
+```

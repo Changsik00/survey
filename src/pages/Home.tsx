@@ -12,18 +12,22 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 import { LocalStorageTemplateRepository } from '@/repositories/LocalStorageTemplateRepository';
 import { TemplateWithId } from '@/repositories/TemplateRepository';
 
 export default function Home() {
   const navigate = useNavigate();
   const [templates, setTemplates] = useState<TemplateWithId[]>([]);
+  const [filteredTemplates, setFilteredTemplates] = useState<TemplateWithId[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const repository = new LocalStorageTemplateRepository();
 
-  // 템플릿 목록 가져오기
   useEffect(() => {
+    // 템플릿 목록 가져오기
     const fetchedTemplates = repository.findAll();
     setTemplates(fetchedTemplates);
+    setFilteredTemplates(fetchedTemplates); // 초기 목록 설정
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -38,6 +42,23 @@ export default function Home() {
   const handleDeleteTemplate = (id: string) => {
     repository.delete(id);
     setTemplates((prevTemplates) => prevTemplates.filter((t) => t.id !== id));
+    setFilteredTemplates((prev) => prev.filter((t) => t.id !== id));
+  };
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+    filterTemplates(query);
+  };
+
+  const filterTemplates = (query: string) => {
+    const lowerCaseQuery = query.toLowerCase();
+    const filtered = templates.filter(
+      (template) =>
+        template.name.toLowerCase().includes(lowerCaseQuery) ||
+        (template.description || '').toLowerCase().includes(lowerCaseQuery)
+    );
+    setFilteredTemplates(filtered);
   };
 
   return (
@@ -48,25 +69,43 @@ export default function Home() {
         <p className="text-gray-600">만든 설문 템플릿을 확인하거나 새로 만들어보세요!</p>
       </div>
 
-      {/* 템플릿 생성 버튼 */}
-      <div className="mb-6">
-        <Button onClick={goToCreateTemplate} className="px-6 py-3 text-lg font-semibold">
+      {/* 새로 만들기 버튼 섹션 (CTA) */}
+      <div className="mb-10">
+        <Button onClick={goToCreateTemplate} className="px-6 py-3 text-lg font-semibold bg-blue-600 hover:bg-blue-700">
           새 템플릿 만들기
         </Button>
       </div>
 
-      {/* 템플릿 목록 */}
-      <div className="w-full max-w-4xl px-4">
-        {templates.length === 0 ? (
+      {/* 검색 및 목록 섹션 */}
+      <div className="w-full max-w-4xl px-4 mt-5">
+        {/* 검색 바 */}
+        <div className="mb-6">
+          <Input
+            type="text"
+            placeholder="템플릿 검색..."
+            value={searchQuery}
+            onChange={handleSearch}
+            className="w-full max-w-md"
+          />
+        </div>
+
+        {/* 템플릿 목록 */}
+        {filteredTemplates.length === 0 ? (
           <Card className="text-center p-6">
             <CardContent>
-              <p className="text-gray-500 text-lg">아직 만든 템플릿이 없습니다.</p>
-              <p className="text-gray-400 mt-2">위 버튼을 눌러 첫 템플릿을 만들어보세요!</p>
+              <p className="text-gray-500 text-lg">
+                {searchQuery ? '검색 결과가 없습니다.' : '아직 만든 템플릿이 없습니다.'}
+              </p>
+              <p className="text-gray-400 mt-2">
+                {searchQuery
+                  ? '다른 키워드로 검색하거나 새 템플릿을 만들어보세요!'
+                  : '위 버튼을 눌러 첫 템플릿을 만들어보세요!'}
+              </p>
             </CardContent>
           </Card>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {templates.map((template) => (
+            {filteredTemplates.map((template) => (
               <Card key={template.id} className="hover:shadow-lg transition-all">
                 <CardHeader>
                   <CardTitle>{template.name}</CardTitle>
@@ -95,7 +134,7 @@ export default function Home() {
                       <DialogHeader>
                         <DialogTitle>템플릿 삭제 확인</DialogTitle>
                         <DialogDescription>
-                          {template.name} 템플릿을 삭제하시겠습니까? 이 작업은 취소할 수 없습니다.
+                          {`" ${template.name} " 템플릿을 삭제하시겠습니까? 이 작업은 취소할 수 없습니다.`}
                         </DialogDescription>
                       </DialogHeader>
                       <DialogFooter>
