@@ -14,8 +14,18 @@
 
 ## 🌻 설치 및 실행 방법
 
+`docker-compose` or `docker compose` 사용
+
 ```bash
-docker-compose up -d
+docker-compose up -d 
+```
+
+이전 내용이 있다면
+
+```bash
+docker-compose down
+docker-compose build --no-cache
+docker-compose up -d 
 ```
 
 - 브라우저에서 접속: `localhost:3000`에서 확인 가능
@@ -25,6 +35,32 @@ docker-compose up -d
 이 프로젝트는 다음과 같은 도커 구성을 사용합니다:
 
 - `dockerfile`: 애플리케이션 빌드 및 실행 환경 정의
+
+## 🌻 주요파일 구성
+
+```bash
+/src
+├── /components
+│   └── /ui
+│       ├── button.tsx
+│       ├── card.tsx
+│       ├── dialog.tsx
+│       └── input.tsx
+├── /pages
+│   ├── Home.tsx
+│   ├── TemplateCreate.tsx
+│   └── TemplateDetail.tsx
+├── /repositories
+│   ├── LocalStorageTemplateRepository.ts
+│   └── TemplateRepository.ts
+├── /types
+│   └── schema.ts
+└── /tests
+    └── Home.test.tsx
+Dockerfile
+docker-compose.yml
+README.md
+```
 
 ## 🚀 Template Form 설계
 
@@ -87,7 +123,7 @@ TemplateForm: 입력 & 유효성 검사
     왜 나눴어요?:
         입력 UI와 유효성 검사는 따로 놀아야 에러 메시지 띄우기 같은 UX 개선이 편함.
         FieldsManager와 상태 공유하면서 복잡한 필드 관리 넘기기 좋아요.
-FieldsManager: 필드 세부 관리
+FieldsManager: 주관식, 객관식 필드 세부 관리
     책임: 필드 추가/삭제/수정 같은 CRUD 작업.
     왜 나눴어요?:
         텍스트, 체크박스 같은 필드 타입 UI와 로직을 묶어서 재사용성 챙김.
@@ -99,21 +135,12 @@ LocalStorageTemplateRepository: 데이터 보관 관리
         나중에 서버 API나 다른 스토리지로 전환할 때 코드 수정 최소화 가능.
 ```
 
-### 🌟 예시: 에러 핸들링 분리
+### 🌟 예시: zod를 통한 에러 핸들링 분리
 
 ```text
 TemplateForm: "최소 하나의 필드가 필요합니다" 같은 전체 에러 띄움.
 FieldsManager: "필드 이름은 필수입니다" 같은 개별 에러 띄움.
 결과: 에러가 계층적으로 나뉘어서 사용자한테 더 명확하게 보여요!
-```
-
-### 🎉 설계의 장점
-
-```text
-유지보수성: 컴포넌트와 Repository마다 책임이 하나라 수정할 때 다른 데 안 튀어요.
-확장성: 새 필드 타입은 FieldsManager에서, 저장 방식 바꾸기는 Repository에서 간단히!
-사용자 경험: 입력 오류 바로 알려주고, 비즈니스 로직은 조용히 처리해요.
-테스트 용이성: Repository를 Mock으로 대체해서 데이터 로직 테스트 쉬움.
 ```
 
 ## 🎨 UI 컴포넌트
@@ -123,3 +150,8 @@ FieldsManager: "필드 이름은 필수입니다" 같은 개별 에러 띄움.
 ```bash
 pnpm dlx shadcn@latest add button card dialog input
 ```
+
+## 🐞 테스트 코드
+
+- **유닛 테스트**: 테스트 코드는 `Vitest`를 사용하며, DOM 관련 테스트를 위해 `jsdom` 환경에서 실행됩니다.
+- **E2E 테스트**: 차후 `Playwright`를 활용한 End-to-End 테스트를 추가할 예정입니다.
