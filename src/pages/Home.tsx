@@ -25,7 +25,7 @@ export default function Home() {
 
   useEffect(() => {
     // 템플릿 목록 가져오기
-    const fetchedTemplates = repository.findAll();
+    const fetchedTemplates = repository.findAll() || [];
     setTemplates(fetchedTemplates);
     setFilteredTemplates(fetchedTemplates); // 초기 목록 설정
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -128,7 +128,9 @@ export default function Home() {
                   </a>
                   <Dialog>
                     <DialogTrigger asChild>
-                      <Button variant="destructive">삭제</Button>
+                      <Button variant="destructive" data-testid={`delete-button-${template.id}`}>
+                        삭제
+                      </Button>
                     </DialogTrigger>
                     <DialogContent>
                       <DialogHeader>
@@ -138,7 +140,11 @@ export default function Home() {
                         </DialogDescription>
                       </DialogHeader>
                       <DialogFooter>
-                        <Button variant="destructive" onClick={() => handleDeleteTemplate(template.id)}>
+                        <Button
+                          variant="destructive"
+                          data-testid={`confirm-delete-button-${template.id}`}
+                          onClick={() => handleDeleteTemplate(template.id)}
+                        >
                           삭제
                         </Button>
                       </DialogFooter>
